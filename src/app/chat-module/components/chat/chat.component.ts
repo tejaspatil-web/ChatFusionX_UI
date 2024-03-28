@@ -1,48 +1,82 @@
 import { Component, ElementRef, ViewChild } from '@angular/core';
 import { ChatService } from '../../services/chat/chat.service';
 import { OnInit } from '@angular/core';
+import { MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { DialogComponent } from 'src/app/shared/components/dialog/dialog.component';
 
 @Component({
   selector: 'app-chat',
   templateUrl: './chat.component.html',
-  styleUrls: ['./chat.component.scss']
+  styleUrls: ['./chat.component.scss'],
 })
 export class ChatComponent implements OnInit {
   @ViewChild('scrollContainer') private scrollContainer: ElementRef;
-  userMessage:string=''
-  constructor(private _chatService:ChatService){}
-messages = [
-  { sender: 'John', message: 'Hey there!', time: '10:00 AM' },
-  { sender: 'Jane', message: 'Hi John! How are you?', time: '10:05 AM' },
-  { sender: 'John', message: 'I\'m good, thanks! How about you?', time: '10:10 AM' },
-  { sender: 'Jane', message: 'I\'m great, thanks for asking!', time: '10:15 AM' },
-  { sender: 'John', message: 'Hey there!', time: '10:00 AM' },
-  { sender: 'Jane', message: 'Hi John! How are you?', time: '10:05 AM' },
-  { sender: 'John', message: 'I\'m good, thanks! How about you?', time: '10:10 AM' },
-  { sender: 'Jane', message: 'I\'m great, thanks for asking!', time: '10:15 AM' },
-  { sender: 'John', message: 'Hey there!', time: '10:00 AM' },
-  { sender: 'Jane', message: 'Hi John! How are you?', time: '10:05 AM' },
-  { sender: 'John', message: 'I\'m good, thanks! How about you?', time: '10:10 AM' },
-  { sender: 'Jane', message: 'I\'m great, thanks for asking!', time: '10:15 AM' },
-];
+  public userMessage: string = '';
+  public messages = [];
+  constructor(private _chatService: ChatService, public dialog: MatDialog) {}
 
-ngOnInit(){
-  const currentTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-  this._chatService.joinChatRoom({sender: 'Tejas', message: this.userMessage, time: currentTime})
-}
-sendMessage() {
-  if(this.userMessage !== ''){
-    const currentTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    const message = {sender: 'You', message: this.userMessage, time: currentTime }
-    this.messages.push(message)
-    this._chatService.sendMessage(message)
-    this.userMessage = ''
-    this.scrollToBottom()
+  ngOnInit() {
+    this.openDialog();
+    this._chatService.joinChatRoom();
+    this.getUserMessages();
+    this.getChatHistory();
   }
-}
 
-scrollToBottom(): void {
-  this.scrollContainer.nativeElement.scrollTop = this.scrollContainer.nativeElement.scrollHeight;
-}
+  openDialog(): void {
+    if (!localStorage.getItem('userId')) {
+      const dialogRef = this.dialog.open(DialogComponent, {
+        data: {},
+        width: '365px',
+        height: '290px',
+        disableClose: true,
+      });
+    }
+  }
 
+  sendMessage() {
+    if (this.userMessage !== '') {
+      const currentTime = new Date().toLocaleTimeString([], {
+        hour: '2-digit',
+        minute: '2-digit',
+      });
+      const message = {
+        userName: 'You',
+        userMessage: this.userMessage,
+        time: currentTime,
+      };
+      this.messages.push(message);
+      const payload = {
+        userName: localStorage.getItem('userName'),
+        userId: localStorage.getItem('userId'),
+        userMessage: this.userMessage,
+        time: currentTime,
+      };
+      this._chatService.sendMessage(JSON.stringify(payload));
+      this.userMessage = '';
+      this.scrollToBottom();
+    }
+  }
+
+  getChatHistory() {
+    this._chatService.getChatHistory().subscribe((data: any) => {
+      this.messages = data;
+      this.messages.forEach((ele) => {
+        if (localStorage.getItem('userId') === ele.userId) {
+          ele.userName = 'You';
+        }
+      });
+    });
+  }
+
+  getUserMessages() {
+    this._chatService.getUsersMessage().subscribe((messages) => {
+      const userMessage = JSON.parse(messages);
+      this.messages.push(userMessage);
+    });
+  }
+
+  scrollToBottom(): void {
+    this.scrollContainer.nativeElement.scrollTop =
+      this.scrollContainer.nativeElement.scrollHeight;
+  }
 }

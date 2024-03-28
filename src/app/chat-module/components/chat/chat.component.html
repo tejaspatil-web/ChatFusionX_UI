@@ -1,16 +1,19 @@
 <div class="chat-container">
-    <div class="chat-header">
-      ChatFusionX
-    </div>
-    <div class="chat-messages" #scrollContainer>
-      <div class="message" *ngFor="let message of messages">
-        <span class="sender">{{message.sender}}</span>: 
-        <span class="message-body">{{message.message}}</span>
-        <span class="time">{{message.time}}</span>
-      </div>
-    </div>
-    <div class="chat-input">
-      <input type="text" [(ngModel)]="userMessage" placeholder="Type your message here">
-      <button id="send-button" (click)="sendMessage()">Send</button>
+  <div class="chat-header">ChatFusionX</div>
+  <div class="chat-messages" #scrollContainer>
+    <div class="message" *ngFor="let message of messages">
+      <span class="sender">{{ message.userName }}</span
+      >:
+      <span class="message-body">{{ message.userMessage }}</span>
+      <span class="time">{{ message.time }}</span>
     </div>
   </div>
+  <div class="chat-input">
+    <input
+      type="text"
+      [(ngModel)]="userMessage"
+      placeholder="Type your message here"
+    />
+    <button id="send-button" (click)="sendMessage()">Send</button>
+  </div>
+</div>

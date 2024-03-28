@@ -1,0 +1,33 @@
+<div class="heading">
+  <h3>ChatFusionX</h3>
+</div>
+<div class="dialog-container">
+  <div>
+    <p>
+      <mat-form-field appearance="outline">
+        <mat-label>Enter Your First Name</mat-label>
+        <input matInput [(ngModel)]="userFirstName" />
+        <mat-icon matSuffix>perm_identity</mat-icon>
+      </mat-form-field>
+    </p>
+    <p>
+      <mat-form-field appearance="outline">
+        <mat-label>Enter Your Last Name</mat-label>
+        <input matInput [(ngModel)]="userLastName" />
+        <mat-icon matSuffix>sentiment_very_satisfied</mat-icon>
+      </mat-form-field>
+    </p>
+  </div>
+  <div class="userActionBtn">
+    <button
+      mat-raised-button
+      [disabled]="userFirstName === '' || userLastName === ''"
+      (click)="saveUserDetails()"
+    >
+      <span *ngIf="!isLoding">Save</span>
+      <span *ngIf="isLoding"
+        ><mat-spinner class="mat-spinner"></mat-spinner
+      ></span>
+    </button>
+  </div>
+</div>

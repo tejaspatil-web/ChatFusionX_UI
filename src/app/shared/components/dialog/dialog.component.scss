@@ -1,0 +1,77 @@
+.dialog-container {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.heading {
+    background-color: #007bff;
+    padding: 10px;
+    border-radius: 4px 4px 0px 0px;
+
+    h3 {
+        text-align: center;
+        color: white;
+        font-weight: 300;
+    }
+}
+
+
+::ng-deep .mat-mdc-dialog-container .mat-mdc-dialog-surface,
+::ng-deep .mat-mdc-dialog-container .mdc-dialog__surface {
+    background-color: #f0f0f0;
+}
+
+/* Change the border color */
+::ng-deep .mdc-text-field--outlined:not(.mdc-text-field--disabled) .mdc-notched-outline__leading,
+::ng-deep .mdc-text-field--outlined:not(.mdc-text-field--disabled) .mdc-notched-outline__notch,
+::ng-deep .mdc-text-field--outlined:not(.mdc-text-field--disabled) .mdc-notched-outline__trailing {
+    border-color: var(--border-color) !important;
+}
+
+/* Change the border width */
+::ng-deep .mdc-text-field--outlined:not(.mdc-text-field--disabled) .mdc-notched-outline .mdc-notched-outline__leading,
+::ng-deep .mdc-text-field--outlined:not(.mdc-text-field--disabled) .mdc-notched-outline .mdc-notched-outline__notch,
+::ng-deep .mdc-text-field--outlined:not(.mdc-text-field--disabled) .mdc-notched-outline .mdc-notched-outline__trailing {
+    border-width: 1.5px !important;
+}
+
+/* Change the border focused color */
+::ng-deep .mdc-text-field--outlined:not(.mdc-text-field--disabled).mdc-text-field--focused .mdc-notched-outline__leading,
+::ng-deep .mdc-text-field--outlined:not(.mdc-text-field--disabled).mdc-text-field--focused .mdc-notched-outline__notch,
+::ng-deep .mdc-text-field--outlined:not(.mdc-text-field--disabled).mdc-text-field--focused .mdc-notched-outline__trailing {
+    border-color: black !important;
+}
+
+/* Change the border hover color */
+::ng-deep .mdc-text-field--outlined:not(.mdc-text-field--disabled):not(.mdc-text-field--focused):hover .mdc-notched-outline .mdc-notched-outline__leading,
+::ng-deep .mdc-text-field--outlined:not(.mdc-text-field--disabled):not(.mdc-text-field--focused):hover .mdc-notched-outline .mdc-notched-outline__notch,
+::ng-deep .mdc-text-field--outlined:not(.mdc-text-field--disabled):not(.mdc-text-field--focused):hover .mdc-notched-outline .mdc-notched-outline__trailing {
+    border-color: var(--color-primary) !important;
+}
+
+::ng-deep mat-label {
+    color: black;
+}
+
+input {
+    color: black !important;
+}
+
+.userActionBtn {
+    button {
+        background-color: #007bff;
+        width: 265px;
+
+        mat-spinner {
+            width: 20px !important;
+            height: 25px !important;
+        }
+    }
+}
+
+.mat-spinner::ng-deep circle {
+    stroke: #fff;
+}
