@@ -8,7 +8,8 @@ import { Socket, io } from 'socket.io-client';
 })
 export class ChatService {
   private _socket: Socket;
-  private _url: string = 'http://localhost:8080';
+  private _url: string =
+    'https://chatfusionx-git-main-tejas-patils-projects.vercel.app';
   private _userMessages: Subject<string> = new Subject();
 
   constructor(private _http: HttpClient) {
