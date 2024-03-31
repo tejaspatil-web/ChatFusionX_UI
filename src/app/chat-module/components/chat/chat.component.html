@@ -2,9 +2,13 @@
   <div class="chat-header">ChatFusionX</div>
   <div class="chat-messages" #scrollContainer>
     <div class="message" *ngFor="let message of messages">
-      <span class="sender">{{ message.userName }}</span
-      >:
-      <span class="message-body">{{ message.userMessage }}</span>
+      <div class="sender">
+        <span>{{ message.userName }}</span
+        >:
+      </div>
+      <div class="message-body">
+        <span>{{ message.userMessage }}</span>
+      </div>
       <span class="time">{{ message.time }}</span>
     </div>
   </div>

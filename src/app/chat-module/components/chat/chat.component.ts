@@ -1,8 +1,9 @@
 import { Component, ElementRef, ViewChild } from '@angular/core';
 import { ChatService } from '../../services/chat/chat.service';
 import { OnInit } from '@angular/core';
-import { MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { MatDialog } from '@angular/material/dialog';
 import { DialogComponent } from 'src/app/shared/components/dialog/dialog.component';
+import { MatSnackBar, MatSnackBarConfig } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-chat',
@@ -13,7 +14,11 @@ export class ChatComponent implements OnInit {
   @ViewChild('scrollContainer') private scrollContainer: ElementRef;
   public userMessage: string = '';
   public messages = [];
-  constructor(private _chatService: ChatService, public dialog: MatDialog) {}
+  constructor(
+    private _chatService: ChatService,
+    public dialog: MatDialog,
+    private _snackBar: MatSnackBar
+  ) {}
 
   ngOnInit() {
     this.openDialog();
@@ -58,6 +63,11 @@ export class ChatComponent implements OnInit {
   }
 
   getChatHistory() {
+    const config = new MatSnackBarConfig();
+    // config.duration = 2000; // Duration in milliseconds
+    config.verticalPosition = 'top';
+    config.panelClass = ['center-text'];
+    this._snackBar.open('Waiting for connection...', '', config);
     this._chatService.getChatHistory().subscribe((data: any) => {
       this.messages = data;
       this.messages.forEach((ele) => {
@@ -65,6 +75,7 @@ export class ChatComponent implements OnInit {
           ele.userName = 'You';
         }
       });
+      this._snackBar.dismiss();
     });
   }
 
