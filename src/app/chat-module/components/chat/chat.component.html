@@ -1,7 +1,23 @@
 <div class="chat-container">
-  <div class="chat-header">ChatFusionX</div>
+  <div class="chat-header">
+    <div class="chat-header-text">ChatFusionX</div>
+    <button
+      [disabled]="isProfileButtonActive"
+      (click)="editProfile()"
+      class="edit-button"
+    >
+      <mat-icon>account_circle</mat-icon>
+      <span>{{ firstName }} {{ lastName }}</span>
+    </button>
+  </div>
   <div class="chat-messages" #scrollContainer>
-    <div class="message" *ngFor="let message of messages">
+    <div
+      [ngClass]="{
+        'your-message': message.userName === 'You',
+        message: message.userName !== 'You'
+      }"
+      *ngFor="let message of messages"
+    >
       <div class="sender">
         <span>{{ message.userName }}</span
         >:
@@ -16,8 +32,11 @@
     <input
       type="text"
       [(ngModel)]="userMessage"
+      [disabled]="isSendMsgButtonActive"
       placeholder="Type your message here"
     />
-    <button id="send-button" (click)="sendMessage()">Send</button>
+    <button id="send-button" (click)="sendMessage()">
+      <mat-icon>send</mat-icon>
+    </button>
   </div>
 </div>

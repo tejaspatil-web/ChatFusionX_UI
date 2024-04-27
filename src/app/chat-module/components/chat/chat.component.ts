@@ -1,4 +1,4 @@
-import { Component, ElementRef, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
 import { ChatService } from '../../services/chat/chat.service';
 import { OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
@@ -10,31 +10,57 @@ import { MatSnackBar, MatSnackBarConfig } from '@angular/material/snack-bar';
   templateUrl: './chat.component.html',
   styleUrls: ['./chat.component.scss'],
 })
-export class ChatComponent implements OnInit {
+export class ChatComponent implements OnInit, AfterViewInit {
   @ViewChild('scrollContainer') private scrollContainer: ElementRef;
   public userMessage: string = '';
   public messages = [];
+  public firstName: string = '';
+  public lastName: string = '';
+  public isProfileButtonActive: boolean = true;
+  public isSendMsgButtonActive: boolean = true;
   constructor(
     private _chatService: ChatService,
     public dialog: MatDialog,
     private _snackBar: MatSnackBar
   ) {}
 
+  ngAfterViewInit(): void {}
+
   ngOnInit() {
-    this.openDialog();
+    this.openDialog('first-load');
+    this.firstName = localStorage.getItem('firstName');
+    this.lastName = localStorage.getItem('lastName');
     this._chatService.joinChatRoom();
     this.getUserMessages();
     this.getChatHistory();
   }
 
-  openDialog(): void {
-    if (!localStorage.getItem('userId')) {
-      const dialogRef = this.dialog.open(DialogComponent, {
-        data: {},
-        width: '365px',
-        height: '290px',
-        disableClose: true,
-      });
+  openDialog(type: string): void {
+    switch (type) {
+      case 'first-load':
+        if (!localStorage.getItem('userId')) {
+          const dialogRef = this.dialog.open(DialogComponent, {
+            data: { type: 'first-load' },
+            width: '365px',
+            height: '290px',
+            disableClose: true,
+          });
+          dialogRef.afterClosed().subscribe((status) => {
+            this.firstName = localStorage.getItem('firstName');
+            this.lastName = localStorage.getItem('lastName');
+          });
+        }
+        break;
+      case 'edit-profile':
+        const dialogRef = this.dialog.open(DialogComponent, {
+          data: { type: 'edit-profile' },
+          width: '365px',
+          height: '290px',
+        });
+        dialogRef.afterClosed().subscribe((status) => {
+          this.firstName = localStorage.getItem('firstName');
+          this.lastName = localStorage.getItem('lastName');
+        });
     }
   }
 
@@ -50,15 +76,19 @@ export class ChatComponent implements OnInit {
         time: currentTime,
       };
       this.messages.push(message);
+      const firstName = localStorage.getItem('firstName');
+      const lastName = localStorage.getItem('lastName');
       const payload = {
-        userName: localStorage.getItem('userName'),
+        userName: `${firstName} ${lastName}`,
         userId: localStorage.getItem('userId'),
         userMessage: this.userMessage,
         time: currentTime,
       };
       this._chatService.sendMessage(JSON.stringify(payload));
       this.userMessage = '';
-      this.scrollToBottom();
+      requestAnimationFrame(() => {
+        this.scrollToBottom();
+      });
     }
   }
 
@@ -76,6 +106,11 @@ export class ChatComponent implements OnInit {
         }
       });
       this._snackBar.dismiss();
+      this.isProfileButtonActive = false;
+      this.isSendMsgButtonActive = false;
+      requestAnimationFrame(() => {
+        this.scrollToBottom();
+      });
     });
   }
 
@@ -87,7 +122,15 @@ export class ChatComponent implements OnInit {
   }
 
   scrollToBottom(): void {
-    this.scrollContainer.nativeElement.scrollTop =
-      this.scrollContainer.nativeElement.scrollHeight;
+    try {
+      this.scrollContainer.nativeElement.scrollTo({
+        top: this.scrollContainer.nativeElement.scrollHeight,
+        behavior: 'smooth',
+      });
+    } catch (err) {}
+  }
+
+  editProfile() {
+    this.openDialog('edit-profile');
   }
 }

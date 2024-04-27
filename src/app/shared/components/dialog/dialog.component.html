@@ -21,7 +21,7 @@
   <div class="userActionBtn">
     <button
       mat-raised-button
-      [disabled]="userFirstName === '' || userLastName === ''"
+      [disabled]="disabled()"
       (click)="saveUserDetails()"
     >
       <span *ngIf="!isLoding">Save</span>
