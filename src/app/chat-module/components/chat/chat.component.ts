@@ -33,7 +33,7 @@ export class ChatComponent implements OnInit, AfterViewInit {
     this.firstName = localStorage.getItem('firstName');
     this.lastName = localStorage.getItem('lastName');
     this.userId = localStorage.getItem('userId');
-    if (this.userId !== '') {
+    if (this.userId) {
       this._chatService.joinChatRoom();
       this.getUserMessages();
       this.getChatHistory();
@@ -54,6 +54,10 @@ export class ChatComponent implements OnInit, AfterViewInit {
             if (status) {
               this.firstName = localStorage.getItem('firstName');
               this.lastName = localStorage.getItem('lastName');
+              this.userId = localStorage.getItem('userId');
+              this._chatService.joinChatRoom();
+              this.getUserMessages();
+              this.getChatHistory();
             }
           });
         }
@@ -69,9 +73,6 @@ export class ChatComponent implements OnInit, AfterViewInit {
             this.firstName = localStorage.getItem('firstName');
             this.lastName = localStorage.getItem('lastName');
             this.userId = localStorage.getItem('userId');
-            this._chatService.joinChatRoom();
-            this.getUserMessages();
-            this.getChatHistory();
           }
         });
     }
