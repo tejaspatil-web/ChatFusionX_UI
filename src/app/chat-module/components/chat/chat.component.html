@@ -20,6 +20,12 @@
     >
       <span class="sender">{{ message.userName }} :</span>
       <span class="message-body">{{ message.userMessage }}</span>
+      <span
+        *ngIf="message.isAdmin"
+        (click)="deleteMessage(message._id)"
+        class="delete-msg"
+        ><mat-icon>delete_forever</mat-icon></span
+      >
       <span class="time">{{ message.time }}</span>
     </div>
   </div>

@@ -35,13 +35,21 @@ export class ChatService {
     return this._userMessages.asObservable();
   }
 
-  getChatHistory() {
-    return this._http.get(`${this._url}/api/user/getChatHistory`);
+  getChatHistory(userId: string) {
+    return this._http.get(
+      `${this._url}/api/user/getChatHistory/userId/${userId}`
+    );
   }
 
   updateUserName(userId: string, updatedName: string) {
     return this._http.put(`${this._url}/api/user/updateUserName/${userId}`, {
       userName: updatedName,
     });
+  }
+
+  deleteChat(chatId: string, userId: string) {
+    return this._http.delete(
+      `${this._url}/api/user/deleteChat/chatId/${chatId}/userId/${userId}`
+    );
   }
 }

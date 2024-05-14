@@ -16,8 +16,10 @@ export class ChatComponent implements OnInit, AfterViewInit {
   public messages = [];
   public firstName: string = '';
   public lastName: string = '';
+  public userId: string = '';
   public isProfileButtonActive: boolean = true;
   public isSendMsgButtonActive: boolean = true;
+  public isAdminUser: boolean = false;
   constructor(
     private _chatService: ChatService,
     public dialog: MatDialog,
@@ -30,9 +32,12 @@ export class ChatComponent implements OnInit, AfterViewInit {
     this.openDialog('first-load');
     this.firstName = localStorage.getItem('firstName');
     this.lastName = localStorage.getItem('lastName');
-    this._chatService.joinChatRoom();
-    this.getUserMessages();
-    this.getChatHistory();
+    this.userId = localStorage.getItem('userId');
+    if (this.userId !== '') {
+      this._chatService.joinChatRoom();
+      this.getUserMessages();
+      this.getChatHistory();
+    }
   }
 
   openDialog(type: string): void {
@@ -63,9 +68,21 @@ export class ChatComponent implements OnInit, AfterViewInit {
           if (status) {
             this.firstName = localStorage.getItem('firstName');
             this.lastName = localStorage.getItem('lastName');
+            this.userId = localStorage.getItem('userId');
+            this._chatService.joinChatRoom();
+            this.getUserMessages();
+            this.getChatHistory();
           }
         });
     }
+  }
+
+  openSnackBar(message: string, time: number) {
+    const config = new MatSnackBarConfig();
+    config.duration = time; // Duration in milliseconds
+    config.verticalPosition = 'top';
+    config.panelClass = ['center-text'];
+    this._snackBar.open(message, '', config);
   }
 
   sendMessage() {
@@ -79,7 +96,10 @@ export class ChatComponent implements OnInit, AfterViewInit {
         userMessage: this.userMessage,
         time: currentTime,
       };
-      this.messages.push(message);
+
+      this.messages[0].isAdmin
+        ? this.messages.push({ ...message, isAdmin: true })
+        : this.messages.push(message);
       const firstName = localStorage.getItem('firstName');
       const lastName = localStorage.getItem('lastName');
       const payload = {
@@ -97,15 +117,11 @@ export class ChatComponent implements OnInit, AfterViewInit {
   }
 
   getChatHistory() {
-    const config = new MatSnackBarConfig();
-    // config.duration = 2000; // Duration in milliseconds
-    config.verticalPosition = 'top';
-    config.panelClass = ['center-text'];
-    this._snackBar.open('Waiting for connection...', '', config);
-    this._chatService.getChatHistory().subscribe((data: any) => {
+    this.openSnackBar('Waiting for connection...', 0);
+    this._chatService.getChatHistory(this.userId).subscribe((data: any) => {
       this.messages = data;
       this.messages.forEach((ele) => {
-        if (localStorage.getItem('userId') === ele.userId) {
+        if (this.userId === ele.userId) {
           ele.userName = 'You';
         }
       });
@@ -122,6 +138,20 @@ export class ChatComponent implements OnInit, AfterViewInit {
     this._chatService.getUsersMessage().subscribe((messages) => {
       const userMessage = JSON.parse(messages);
       this.messages.push(userMessage);
+    });
+  }
+
+  deleteMessage(chatId: string) {
+    this._chatService.deleteChat(chatId, this.userId).subscribe({
+      next: (res: any) => {
+        this.openSnackBar(res.message, 2000);
+        this.messages = this.messages.filter((ele) => {
+          return ele._id !== chatId;
+        });
+      },
+      error: (error) => {
+        this.openSnackBar(error.message, 2000);
+      },
     });
   }
 
