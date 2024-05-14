@@ -18,23 +18,21 @@
       }"
       *ngFor="let message of messages"
     >
-      <div class="sender">
-        <span>{{ message.userName }}</span
-        >:
-      </div>
-      <div class="message-body">
-        <span>{{ message.userMessage }}</span>
-      </div>
+      <span class="sender">{{ message.userName }} :</span>
+      <span class="message-body">{{ message.userMessage }}</span>
       <span class="time">{{ message.time }}</span>
     </div>
   </div>
+
   <div class="chat-input">
-    <input
-      type="text"
-      [(ngModel)]="userMessage"
-      [disabled]="isSendMsgButtonActive"
-      placeholder="Type your message here"
-    />
+    <div class="msg-field">
+      <input
+        type="text"
+        [(ngModel)]="userMessage"
+        [disabled]="isSendMsgButtonActive"
+        placeholder="Type your message here"
+      />
+    </div>
     <button id="send-button" (click)="sendMessage()">
       <mat-icon>send</mat-icon>
     </button>

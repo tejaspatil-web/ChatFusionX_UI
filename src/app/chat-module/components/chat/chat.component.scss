@@ -121,15 +121,31 @@
   padding: 10px;
 }
 
-.chat-input input[type="text"] {
-  flex: 1;
-  padding: 8px;
-  border: none;
-  border-radius: 4px;
-  outline: none;
-  font-size: 1rem;
-  background: #272626;
-  color: white;
+.chat-input {
+  .msg-field {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    background: #272626;
+    padding: 0px 8px;
+    border-radius: 4px;
+
+    input[type="text"] {
+      outline: none;
+      border: none;
+      color: white;
+      padding: 8px;
+      border-radius: 4px;
+      font-size: 1rem;
+      width: 100%;
+      background: #272626;
+    }
+
+    mat-icon {
+      color: #f0f0f0;
+      cursor: pointer
+    }
+  }
 }
 
 .chat-input button {

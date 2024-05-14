@@ -54,7 +54,7 @@ export class DialogComponent implements OnInit {
             localStorage.setItem('firstName', this.userFirstName);
             localStorage.setItem('lastName', this.userLastName);
             this.isLoding = false;
-            this._dialogRef.close();
+            this._dialogRef.close(true);
           });
         }
         break;
@@ -73,7 +73,7 @@ export class DialogComponent implements OnInit {
               config.verticalPosition = 'top';
               config.panelClass = ['center-text'];
               this._snackBar.open('Username updated successfully', '', config);
-              this._dialogRef.close();
+              this._dialogRef.close(true);
             },
             error: (error) => {
               const config = new MatSnackBarConfig();

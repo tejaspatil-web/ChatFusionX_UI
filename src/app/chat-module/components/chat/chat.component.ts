@@ -46,8 +46,10 @@ export class ChatComponent implements OnInit, AfterViewInit {
             disableClose: true,
           });
           dialogRef.afterClosed().subscribe((status) => {
-            this.firstName = localStorage.getItem('firstName');
-            this.lastName = localStorage.getItem('lastName');
+            if (status) {
+              this.firstName = localStorage.getItem('firstName');
+              this.lastName = localStorage.getItem('lastName');
+            }
           });
         }
         break;
@@ -58,8 +60,10 @@ export class ChatComponent implements OnInit, AfterViewInit {
           height: '290px',
         });
         dialogRef.afterClosed().subscribe((status) => {
-          this.firstName = localStorage.getItem('firstName');
-          this.lastName = localStorage.getItem('lastName');
+          if (status) {
+            this.firstName = localStorage.getItem('firstName');
+            this.lastName = localStorage.getItem('lastName');
+          }
         });
     }
   }
