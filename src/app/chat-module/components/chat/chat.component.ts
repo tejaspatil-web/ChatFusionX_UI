@@ -13,6 +13,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { DialogComponent } from 'src/app/shared/components/dialog/dialog.component';
 import { MatSnackBar, MatSnackBarConfig } from '@angular/material/snack-bar';
 import { SharedService } from 'src/app/shared/services/shared-service/shared-service.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-chat',
@@ -30,6 +31,7 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
   public isProfileButtonActive: boolean = true;
   public isSendMsgButtonActive: boolean = true;
   public isAdminUser: boolean = false;
+  private _chatFusionXMsgSubscription: Subscription = new Subscription();
   constructor(
     private _chatService: ChatService,
     public dialog: MatDialog,
@@ -45,7 +47,6 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
     this.lastName = localStorage.getItem('lastName');
     this.userId = localStorage.getItem('userId');
     if (this.userId) {
-      this._chatService.joinChatRoom();
       this.getUserMessages();
       this.getChatHistory();
     }
@@ -75,7 +76,6 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
               this.firstName = localStorage.getItem('firstName');
               this.lastName = localStorage.getItem('lastName');
               this.userId = localStorage.getItem('userId');
-              this._chatService.joinChatRoom();
               this.getUserMessages();
               this.getChatHistory();
               this._sharedService.setUserDetails({
@@ -120,7 +120,7 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
         userMessage: this.userMessage,
         time: currentTime,
       };
-      this._chatService.sendMessage(JSON.stringify(payload));
+      this._chatService.sendMessageInFusionXChat(JSON.stringify(payload));
       this.userMessage = '';
       requestAnimationFrame(() => {
         this.scrollToBottom();
@@ -147,10 +147,12 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   getUserMessages() {
-    this._chatService.getUsersMessage().subscribe((messages) => {
-      const userMessage = JSON.parse(messages);
-      this.messages.push(userMessage);
-    });
+    this._chatFusionXMsgSubscription = this._chatService
+      .getUsersMessage()
+      .subscribe((messages) => {
+        const userMessage = JSON.parse(messages);
+        this.messages.push(userMessage);
+      });
   }
 
   deleteMessage(chatId: string) {
@@ -178,5 +180,6 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.isGroupsCompo = false;
+    this._chatFusionXMsgSubscription.unsubscribe();
   }
 }

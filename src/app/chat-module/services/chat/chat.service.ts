@@ -16,23 +16,26 @@ export class ChatService {
     this._socket = io(this._url);
   }
 
-  joinChatRoom() {
+  joinFusionXChatRoom() {
     this._socket.emit('joinRoom', 'fusionChatX');
+  }
+
+  onSocketForGetUsersMessage() {
+    this._socket.on('message', (message: string) => {
+      this._userMessages.next(message);
+    });
+  }
+
+  getUsersMessage() {
+    return this._userMessages.asObservable();
+  }
+
+  sendMessageInFusionXChat(data: any) {
+    this._socket.emit('message', 'fusionChatX', data);
   }
 
   getUserId(userName) {
     return this._http.get(`${this._url}/api/user/username/${userName}`);
-  }
-
-  sendMessage(data: any) {
-    this._socket.emit('message', 'fusionChatX', data);
-  }
-
-  getUsersMessage() {
-    this._socket.on('message', (message: string) => {
-      this._userMessages.next(message);
-    });
-    return this._userMessages.asObservable();
   }
 
   getChatHistory(userId: string) {
