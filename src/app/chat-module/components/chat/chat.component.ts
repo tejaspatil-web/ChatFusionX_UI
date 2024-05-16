@@ -1,17 +1,27 @@
-import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  ElementRef,
+  Input,
+  OnDestroy,
+  Output,
+  ViewChild,
+} from '@angular/core';
 import { ChatService } from '../../services/chat/chat.service';
 import { OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { DialogComponent } from 'src/app/shared/components/dialog/dialog.component';
 import { MatSnackBar, MatSnackBarConfig } from '@angular/material/snack-bar';
+import { SharedService } from 'src/app/shared/services/shared-service/shared-service.service';
 
 @Component({
   selector: 'app-chat',
   templateUrl: './chat.component.html',
   styleUrls: ['./chat.component.scss'],
 })
-export class ChatComponent implements OnInit, AfterViewInit {
+export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('scrollContainer') private scrollContainer: ElementRef;
+  @Input() isGroupsCompo: boolean = false;
   public userMessage: string = '';
   public messages = [];
   public firstName: string = '';
@@ -23,7 +33,8 @@ export class ChatComponent implements OnInit, AfterViewInit {
   constructor(
     private _chatService: ChatService,
     public dialog: MatDialog,
-    private _snackBar: MatSnackBar
+    private _snackBar: MatSnackBar,
+    private _sharedService: SharedService
   ) {}
 
   ngAfterViewInit(): void {}
@@ -38,6 +49,15 @@ export class ChatComponent implements OnInit, AfterViewInit {
       this.getUserMessages();
       this.getChatHistory();
     }
+    this.getUpdatedUserDetails();
+  }
+
+  getUpdatedUserDetails() {
+    this._sharedService.getUserDetails().subscribe((userData: any) => {
+      this.firstName = userData.firstName;
+      this.lastName = userData.lastName;
+      this.userId = userData.userId;
+    });
   }
 
   openDialog(type: string): void {
@@ -58,23 +78,14 @@ export class ChatComponent implements OnInit, AfterViewInit {
               this._chatService.joinChatRoom();
               this.getUserMessages();
               this.getChatHistory();
+              this._sharedService.setUserDetails({
+                firstName: this.firstName,
+                lastName: this.lastName,
+                userId: this.userId,
+              });
             }
           });
         }
-        break;
-      case 'edit-profile':
-        const dialogRef = this.dialog.open(DialogComponent, {
-          data: { type: 'edit-profile' },
-          width: '365px',
-          height: '290px',
-        });
-        dialogRef.afterClosed().subscribe((status) => {
-          if (status) {
-            this.firstName = localStorage.getItem('firstName');
-            this.lastName = localStorage.getItem('lastName');
-            this.userId = localStorage.getItem('userId');
-          }
-        });
     }
   }
 
@@ -165,7 +176,7 @@ export class ChatComponent implements OnInit, AfterViewInit {
     } catch (err) {}
   }
 
-  editProfile() {
-    this.openDialog('edit-profile');
+  ngOnDestroy(): void {
+    this.isGroupsCompo = false;
   }
 }

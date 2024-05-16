@@ -1,0 +1,11 @@
+<div>
+  <app-header></app-header>
+</div>
+<div class="chat-container">
+  <div *ngIf="isBasePathRoute">
+    <app-chat></app-chat>
+  </div>
+  <div *ngIf="!isBasePathRoute">
+    <router-outlet></router-outlet>
+  </div>
+</div>

@@ -21,3 +21,24 @@ body {
   margin: 0;
   font-family: Roboto, "Helvetica Neue", sans-serif
 }
+
+/* Track */
+::-webkit-scrollbar {
+  width: 10px;
+  border-radius: 5px;
+  /* Width of the scrollbar */
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #5c5c5c;
+  border-radius: 5px;
+  /* Color of the scrollbar handle */
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #9b9b9b;
+  border-radius: 5px;
+  /* Color of the scrollbar handle on hover */
+}

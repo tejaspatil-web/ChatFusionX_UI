@@ -1,10 +1,11 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { ChatComponent } from './components/chat/chat.component';
+import { GroupsComponent } from './components/groups/groups.component';
 
 const routes: Routes = [
   {
-    path: 'chatmodule',
+    path: 'chatfusionx',
     children: [
       {
         path: '',
@@ -12,6 +13,7 @@ const routes: Routes = [
         pathMatch: 'full',
       },
       { path: 'chat', component: ChatComponent },
+      { path: 'groups/:id', component: GroupsComponent },
     ],
   },
 ];

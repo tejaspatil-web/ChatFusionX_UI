@@ -1,0 +1,36 @@
+<div class="chat-header-container">
+  <div class="chat-header">
+    <div class="back-button-container">
+      <mat-icon (click)="back()" *ngIf="isNotBasePathRoute"
+        >arrow_back</mat-icon
+      >
+      <div class="chat-header-text">ChatFusionX</div>
+    </div>
+    <button
+      *ngIf="!isNotBasePathRoute"
+      [disabled]="isProfileButtonActive"
+      (click)="openGroupsTab()"
+      class="icon-button"
+    >
+      <mat-icon>group</mat-icon>
+      <span class="icon-button-badge">2</span>
+    </button>
+    <button
+      *ngIf="isNotBasePathRoute"
+      [disabled]="isProfileButtonActive"
+      (click)="createNewGroup()"
+      class="icon-button"
+    >
+      <mat-icon>group_add</mat-icon>
+    </button>
+    <button
+      *ngIf="!isNotBasePathRoute"
+      [disabled]="isProfileButtonActive"
+      (click)="editProfile()"
+      class="edit-button"
+    >
+      <mat-icon>account_circle</mat-icon>
+      <span>{{ firstName }} {{ lastName }}</span>
+    </button>
+  </div>
+</div>

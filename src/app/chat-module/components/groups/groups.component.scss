@@ -1,0 +1,110 @@
+.groups-container {
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+    min-height: 85vh;
+    max-height: 85vh;
+    overflow-y: auto;
+    gap: 10px
+}
+
+.group-list {
+    width: 100%;
+    height: 45px;
+    padding: 3px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border: 1px solid white;
+    border-radius: 50px;
+    cursor: pointer;
+}
+
+.group {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+
+    .group-icon {
+        display: flex;
+        background: white;
+        margin: 0px;
+        padding: 2px;
+        border-radius: 50%;
+
+        mat-icon {
+            width: 35px;
+            height: 35px;
+            font-size: 35px;
+        }
+    }
+
+    .group-name {
+        color: white;
+    }
+}
+
+.notifiction-count {
+    color: white;
+    margin: 10px;
+    background: red;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    text-align: center;
+}
+
+
+.group-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 50px;
+    padding: 0px 10px;
+}
+
+.group-left-content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+}
+
+.group-right-content {
+    cursor: pointer;
+
+    mat-icon {
+        color: white;
+    }
+}
+
+.group-icon {
+    display: flex;
+    background: white;
+    margin: 0px;
+    padding: 2px;
+    border-radius: 50%;
+
+    mat-icon {
+        width: 30px;
+        height: 30px;
+        font-size: 30px;
+    }
+}
+
+.group-name {
+    color: white;
+}
+
+.back-btn {
+    color: white;
+    cursor: pointer;
+
+    mat-icon {
+        color: white;
+        width: 25px;
+        height: 25px;
+        font-size: 25px;
+    }
+}

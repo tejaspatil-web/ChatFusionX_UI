@@ -1,0 +1,28 @@
+<div *ngIf="!openChat" class="groups-container">
+  <div (click)="openGroupChat()" class="group-list">
+    <div class="group">
+      <span class="group-icon">
+        <mat-icon>group</mat-icon>
+      </span>
+      <span class="group-name">GROUP NAME</span>
+    </div>
+    <span class="notifiction-count">2</span>
+  </div>
+</div>
+<div *ngIf="openChat">
+  <div class="group-header">
+    <div class="group-left-content">
+      <span class="back-btn"
+        ><mat-icon (click)="back()">arrow_back</mat-icon></span
+      >
+      <span class="group-icon">
+        <mat-icon>group</mat-icon>
+      </span>
+      <span class="group-name">GROUP NAME</span>
+    </div>
+    <div (click)="shareGroupLink()" class="group-right-content">
+      <mat-icon>share</mat-icon>
+    </div>
+  </div>
+  <app-chat [isGroupsCompo]="true"></app-chat>
+</div>

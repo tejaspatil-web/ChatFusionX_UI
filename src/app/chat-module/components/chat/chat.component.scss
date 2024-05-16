@@ -2,52 +2,10 @@
   max-width: 800px;
   margin: 0 auto;
   background-color: #000000;
-  border-radius: 8px;
+  border-radius: 0px 0px 8px 8px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   overflow: hidden;
   box-shadow: rgba(255, 255, 255, 0.24) 0px 3px 8px;
-}
-
-/* Track */
-::-webkit-scrollbar {
-  width: 10px;
-  border-radius: 5px;
-  /* Width of the scrollbar */
-}
-
-/* Handle */
-::-webkit-scrollbar-thumb {
-  background: #5c5c5c;
-  border-radius: 5px;
-  /* Color of the scrollbar handle */
-}
-
-/* Handle on hover */
-::-webkit-scrollbar-thumb:hover {
-  background: #9b9b9b;
-  border-radius: 5px;
-  /* Color of the scrollbar handle on hover */
-}
-
-.chat-header-text {
-  text-align: center;
-  font-family: "Pacifico", cursive;
-  font-weight: 600;
-  font-style: normal;
-}
-
-.chat-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background-color: #0069d9;
-  color: #fff;
-  padding: 10px;
-  font-size: 1.2rem;
-  font-family: "Platypi", serif;
-  font-optical-sizing: auto;
-  font-weight: bold;
-  font-style: normal;
 }
 
 .chat-messages {
@@ -59,24 +17,18 @@
   overflow-y: auto;
 }
 
-.edit-button {
+.group-messages {
   display: flex;
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  justify-content: center;
-  align-items: center;
-  color: #f0f0f0;
+  flex-direction: column;
+  padding: 10px;
+  min-height: 67vh;
+  max-height: 67vh;
+  overflow-y: auto;
+}
 
-  mat-icon {
-    width: 28px;
-    height: 28px;
-    font-size: 28px;
-  }
-
-  span {
-    font-weight: 600;
-  }
+.header-name {
+  width: 20px;
+  background-color: red;
 }
 
 .message {
@@ -99,6 +51,7 @@
 .sender {
   color: #ffffff;
   font-size: 15px;
+  text-wrap: nowrap;
 }
 
 .message-body {

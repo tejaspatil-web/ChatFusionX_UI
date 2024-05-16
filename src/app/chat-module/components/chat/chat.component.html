@@ -1,16 +1,12 @@
 <div class="chat-container">
-  <div class="chat-header">
-    <div class="chat-header-text">ChatFusionX</div>
-    <button
-      [disabled]="isProfileButtonActive"
-      (click)="editProfile()"
-      class="edit-button"
-    >
-      <mat-icon>account_circle</mat-icon>
-      <span>{{ firstName }} {{ lastName }}</span>
-    </button>
-  </div>
-  <div class="chat-messages" #scrollContainer>
+  <div
+    [ngClass]="{
+      'group-messages ': isGroupsCompo,
+      'chat-messages': !isGroupsCompo
+    }"
+    #scrollContainer
+  >
+    <div class="header-name"></div>
     <div
       [ngClass]="{
         'your-message': message.userName === 'You',

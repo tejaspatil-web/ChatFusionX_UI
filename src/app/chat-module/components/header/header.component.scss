@@ -1,0 +1,111 @@
+.chat-header-container {
+    max-width: 800px;
+    margin: 0 auto;
+    background-color: #000000;
+    border-radius: 8px 8px 0px 0px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    box-shadow: rgba(255, 255, 255, 0.24) 0px 3px 8px;
+}
+
+.chat-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: #0069d9;
+    color: #fff;
+    padding: 10px;
+    font-size: 1.2rem;
+    font-family: "Platypi", serif;
+    font-optical-sizing: auto;
+    font-weight: bold;
+    font-style: normal;
+}
+
+.chat-header-text {
+    text-align: center;
+    font-family: "Pacifico", cursive;
+    font-weight: 600;
+    font-style: normal;
+}
+
+.edit-button {
+    position: relative;
+    display: flex;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    justify-content: center;
+    align-items: center;
+    color: #f0f0f0;
+
+    mat-icon {
+        width: 28px;
+        height: 28px;
+        font-size: 28px;
+    }
+
+    span {
+        font-weight: 700;
+        font-size: 17px;
+        margin-left: 2px;
+    }
+}
+
+.icon-button {
+    position: relative;
+    display: flex;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    justify-content: center;
+    align-items: center;
+    color: #f0f0f0;
+    margin-right: 2px;
+
+    mat-icon {
+        width: 28px;
+        height: 28px;
+        font-size: 28px;
+    }
+
+    span {
+        font-weight: 700;
+        font-size: 17px;
+        margin-left: 2px;
+    }
+}
+
+.icon-button-badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    width: 15px;
+    height: 15px;
+    background: red;
+    color: #ffffff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+    font-weight: 600 !important;
+    font-size: 11px !important;
+    margin-left: 0px !important;
+}
+
+
+.back-button-container {
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    mat-icon {
+        font-weight: 600;
+        margin-right: 5px;
+        border-radius: 50px;
+        background: white;
+        color: #0069d9;
+        cursor: pointer;
+    }
+}

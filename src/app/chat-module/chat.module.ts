@@ -5,9 +5,17 @@ import { ChatComponent } from './components/chat/chat.component';
 import { FormsModule } from '@angular/forms';
 import { MaterialModule } from '../modules/material.module';
 import { SharedModule } from '../shared/shared.module';
+import { MainComponent } from './components/main/main.component';
+import { HeaderComponent } from './components/header/header.component';
+import { GroupsComponent } from './components/groups/groups.component';
 
 @NgModule({
-  declarations: [ChatComponent],
+  declarations: [
+    ChatComponent,
+    MainComponent,
+    HeaderComponent,
+    GroupsComponent,
+  ],
   imports: [
     CommonModule,
     ChatRoutingModule,
@@ -15,6 +23,6 @@ import { SharedModule } from '../shared/shared.module';
     MaterialModule,
     SharedModule,
   ],
-  exports: [ChatComponent],
+  exports: [MainComponent],
 })
 export class ChatModule {}
