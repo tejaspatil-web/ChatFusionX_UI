@@ -4,6 +4,7 @@ import { NavigationEnd, Router } from '@angular/router';
 import { filter } from 'rxjs';
 import { DialogComponent } from 'src/app/shared/components/dialog/dialog.component';
 import { SharedService } from 'src/app/shared/services/shared-service/shared-service.service';
+import { ChatService } from '../../services/chat/chat.service';
 
 @Component({
   selector: 'app-header',
@@ -20,6 +21,7 @@ export class HeaderComponent implements OnInit {
   constructor(
     public dialog: MatDialog,
     private _sharedService: SharedService,
+    private _chatService: ChatService,
     private _router: Router
   ) {}
   ngOnInit(): void {
@@ -67,7 +69,17 @@ export class HeaderComponent implements OnInit {
     });
   }
 
-  createNewGroup() {}
+  createNewGroup() {
+    const dialogRef = this.dialog.open(DialogComponent, {
+      data: { type: 'create-group' },
+      width: '365px',
+      height: '200px',
+    });
+    //This code use may be use in future
+    // dialogRef.afterClosed().subscribe((status) => {
+    //   if (status) {}
+    // });
+  }
 
   openGroupsTab() {
     this._router.navigate([`/chatfusionx/groups/${this.userId}`]);

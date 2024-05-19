@@ -18,12 +18,16 @@
     border: 1px solid white;
     border-radius: 50px;
     cursor: pointer;
+    margin-bottom: 10px;
+    overflow: hidden;
 }
 
 .group {
     display: flex;
     align-items: center;
-    justify-content: center;
+    width: 90%;
+    overflow: hidden;
+    white-space: pre;
     gap: 5px;
 
     .group-icon {
@@ -42,6 +46,8 @@
 
     .group-name {
         color: white;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 }
 
@@ -52,7 +58,10 @@
     border-radius: 50%;
     width: 20px;
     height: 20px;
-    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 75%;
 }
 
 

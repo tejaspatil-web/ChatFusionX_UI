@@ -2,7 +2,7 @@
   <h3>ChatFusionX</h3>
 </div>
 <div class="dialog-container">
-  <div>
+  <div *ngIf="data.type !== 'create-group'">
     <p>
       <mat-form-field appearance="outline">
         <mat-label>Enter Your First Name</mat-label>
@@ -18,13 +18,20 @@
       </mat-form-field>
     </p>
   </div>
+  <div *ngIf="data.type === 'create-group'">
+    <p>
+      <mat-form-field appearance="outline">
+        <mat-label>Enter Group Name</mat-label>
+        <input matInput [(ngModel)]="groupName" />
+        <mat-icon matSuffix>group</mat-icon>
+      </mat-form-field>
+    </p>
+  </div>
   <div class="userActionBtn">
-    <button
-      mat-raised-button
-      [disabled]="disabled()"
-      (click)="saveUserDetails()"
-    >
-      <span *ngIf="!isLoding">Save</span>
+    <button mat-raised-button [disabled]="disabled()" (click)="saveDetails()">
+      <span *ngIf="!isLoding">{{
+        data.type === "create-group" ? "Create Group" : "Save"
+      }}</span>
       <span *ngIf="isLoding"
         ><mat-spinner class="mat-spinner"></mat-spinner
       ></span>

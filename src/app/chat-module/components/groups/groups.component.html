@@ -1,12 +1,20 @@
 <div *ngIf="!openChat" class="groups-container">
-  <div (click)="openGroupChat()" class="group-list">
-    <div class="group">
-      <span class="group-icon">
-        <mat-icon>group</mat-icon>
-      </span>
-      <span class="group-name">GROUP NAME</span>
+  <div *ngIf="groups.length">
+    <div
+      *ngFor="let group of groups"
+      (click)="openGroupChat(group)"
+      class="group-list"
+    >
+      <div class="group">
+        <span class="group-icon">
+          <mat-icon>group</mat-icon>
+        </span>
+        <span class="group-name">{{ group.groupName }}</span>
+      </div>
+      <span *ngIf="group.count" class="notifiction-count">{{
+        group.count
+      }}</span>
     </div>
-    <span class="notifiction-count">2</span>
   </div>
 </div>
 <div *ngIf="openChat">
@@ -18,11 +26,11 @@
       <span class="group-icon">
         <mat-icon>group</mat-icon>
       </span>
-      <span class="group-name">GROUP NAME</span>
+      <span class="group-name">{{ groupName }}</span>
     </div>
     <div (click)="shareGroupLink()" class="group-right-content">
       <mat-icon>share</mat-icon>
     </div>
   </div>
-  <app-chat [isGroupsCompo]="true"></app-chat>
+  <app-chat [groupName]="groupName" [isGroupsCompo]="true"></app-chat>
 </div>

@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Subject } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 import { Socket, io } from 'socket.io-client';
 
 @Injectable({
@@ -16,31 +16,104 @@ export class ChatService {
     this._socket = io(this._url);
   }
 
-  joinFusionXChatRoom() {
-    this._socket.emit('joinRoom', 'fusionChatX');
-  }
-
-  onSocketForGetUsersMessage() {
-    this._socket.on('message', (message: string) => {
-      this._userMessages.next(message);
-    });
-  }
-
-  getUsersMessage() {
-    return this._userMessages.asObservable();
-  }
-
-  sendMessageInFusionXChat(data: any) {
-    this._socket.emit('message', 'fusionChatX', data);
-  }
-
   getUserId(userName) {
     return this._http.get(`${this._url}/api/user/username/${userName}`);
   }
 
-  getChatHistory(userId: string) {
+  login(userDetails) {
+    this._socket.emit(
+      'login',
+      userDetails.userId,
+      `${userDetails.firstName} ${userDetails.lastName}`
+    );
+  }
+
+  createGroup(groupName: string, userId: string): void {
+    this._socket.emit('createGroup', groupName, userId);
+  }
+
+  joinGroup(groupId: string, userId: string): void {
+    this._socket.emit('joinGroup', groupId, userId);
+  }
+
+  getGroupMessages(groupId: string) {
+    this._socket.emit('getGroupMessages', groupId);
+  }
+
+  sendMessage(messageData: any): void {
+    this._socket.emit('message', messageData);
+  }
+
+  inviteUser(groupId: string, userId: string, userName: string): void {
+    this._socket.emit('inviteUser', groupId, userId, userName);
+  }
+
+  readAllMessages(userId: string, groupId: string): void {
+    this._socket.emit('readMessages', { userId, groupId });
+  }
+
+  // Listen to events
+  onEvent(event: string): Observable<any> {
+    return new Observable<any>((observer) => {
+      this._socket.on(event, (data) => observer.next(data));
+    });
+  }
+
+  onMessage(): Observable<any> {
+    return this.onEvent('message');
+  }
+
+  onGroupMessages(): Observable<any> {
+    return this.onEvent('groupMessages');
+  }
+
+  onUnreadMessageCount(): Observable<any> {
+    return this.onEvent('unreadCount');
+  }
+
+  onGroupDetails(): Observable<any> {
+    return this.onEvent('groupsDeatils');
+  }
+
+  onGroupCreate(): Observable<any> {
+    return this.onEvent('groupCreated');
+  }
+
+  onNewMember(): Observable<any> {
+    return this.onEvent('newMember');
+  }
+
+  onError(): Observable<any> {
+    return this.onEvent('error');
+  }
+
+  joinFusionXChatRoom() {
+    this._socket.emit('joinChatFusionXRoom', 'fusionChatX');
+  }
+
+  onSocketForGetChatFusionXUsersMessage() {
+    this._socket.on('chatFusionXMessage', (message: any) => {
+      this._userMessages.next(message);
+    });
+  }
+
+  getChatFusionXUsersMessage() {
+    return this._userMessages.asObservable();
+  }
+
+  sendMessageInFusionXChat(data: any) {
+    this._socket.emit('chatFusionXMessage', 'fusionChatX', data);
+  }
+
+  getChatFusionXHistory(userId: string) {
     return this._http.get(
       `${this._url}/api/user/getChatHistory/userId/${userId}`
+    );
+  }
+
+  deleteChatFusionXChat(chatId: string, userId: string) {
+    return this._http.delete(
+      `${this._url}/api/user/deleteChat/chatId/${chatId}/userId/${userId}`
     );
   }
 
@@ -48,11 +121,5 @@ export class ChatService {
     return this._http.put(`${this._url}/api/user/updateUserName/${userId}`, {
       userName: updatedName,
     });
-  }
-
-  deleteChat(chatId: string, userId: string) {
-    return this._http.delete(
-      `${this._url}/api/user/deleteChat/chatId/${chatId}/userId/${userId}`
-    );
   }
 }

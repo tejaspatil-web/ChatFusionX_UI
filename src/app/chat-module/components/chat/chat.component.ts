@@ -9,11 +9,9 @@ import {
 } from '@angular/core';
 import { ChatService } from '../../services/chat/chat.service';
 import { OnInit } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
-import { DialogComponent } from 'src/app/shared/components/dialog/dialog.component';
-import { MatSnackBar, MatSnackBarConfig } from '@angular/material/snack-bar';
 import { SharedService } from 'src/app/shared/services/shared-service/shared-service.service';
 import { Subscription } from 'rxjs';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-chat',
@@ -23,34 +21,99 @@ import { Subscription } from 'rxjs';
 export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('scrollContainer') private scrollContainer: ElementRef;
   @Input() isGroupsCompo: boolean = false;
+  @Input() groupName: string = '';
+  private _getSelectedGroupChatSubscription: Subscription = new Subscription();
   public userMessage: string = '';
   public messages = [];
   public firstName: string = '';
   public lastName: string = '';
   public userId: string = '';
+  private groupId: string = '';
   public isProfileButtonActive: boolean = true;
   public isSendMsgButtonActive: boolean = true;
   public isAdminUser: boolean = false;
   private _chatFusionXMsgSubscription: Subscription = new Subscription();
+  private _onGroupMessageSubscription: Subscription = new Subscription();
+  private _isLoadFirstTimeChatCompoSubscription: Subscription =
+    new Subscription();
   constructor(
+    private _activateRoute: ActivatedRoute,
     private _chatService: ChatService,
-    public dialog: MatDialog,
-    private _snackBar: MatSnackBar,
     private _sharedService: SharedService
   ) {}
 
   ngAfterViewInit(): void {}
 
   ngOnInit() {
-    this.openDialog('first-load');
     this.firstName = localStorage.getItem('firstName');
     this.lastName = localStorage.getItem('lastName');
     this.userId = localStorage.getItem('userId');
-    if (this.userId) {
-      this.getUserMessages();
-      this.getChatHistory();
-    }
+    this.getSelectedRoutePath();
     this.getUpdatedUserDetails();
+    this.getSelectedGroupChat();
+    this.getGroupMessages();
+    this.getIsLoadFirstTimeChatCompo();
+  }
+
+  getSelectedRoutePath() {
+    if (this.userId) {
+      const activatedRoute = this._activateRoute.snapshot.url
+        .map((segment) => segment.path)
+        .join('/');
+      if (activatedRoute === '' && !this.isGroupsCompo) {
+        this.getChatFusionXUserMessages();
+        this.getChatFusionXChatHistory();
+      }
+      const currentRoute = `/chatfusionx/${activatedRoute}`;
+      const groupListRoute = `/chatfusionx/groups/${this.userId}`;
+      if (currentRoute !== groupListRoute && this.isGroupsCompo) {
+        const path = currentRoute.split('/');
+        this.groupId = path[path.length - 1];
+        this._chatService.getGroupMessages(this.groupId);
+        this._chatService.joinGroup(this.groupId, this.userId);
+      }
+    }
+  }
+
+  getIsLoadFirstTimeChatCompo() {
+    this._isLoadFirstTimeChatCompoSubscription = this._sharedService
+      .getIsLoadFirstTimeChatCompo()
+      .subscribe((isFirstTimeLoad) => {
+        if (isFirstTimeLoad) {
+          this.getChatFusionXUserMessages();
+          this.getChatFusionXChatHistory();
+        }
+      });
+  }
+
+  getSelectedGroupChat() {
+    this._getSelectedGroupChatSubscription = this._chatService
+      .onGroupMessages()
+      .subscribe((data) => {
+        this.messages = data;
+        this.messages.forEach((ele) => {
+          if (ele.userId === this.userId) ele.userName = 'You';
+        });
+        requestAnimationFrame(() => {
+          this.scrollToBottom();
+        });
+      });
+  }
+
+  getGroupMessages() {
+    if (this.userId) {
+      this._onGroupMessageSubscription = this._chatService
+        .onMessage()
+        .subscribe((groupMessage) => {
+          if (groupMessage.userId === this.userId) {
+            groupMessage.userName = 'You';
+            requestAnimationFrame(() => {
+              this.scrollToBottom();
+            });
+          }
+          this.messages.push(groupMessage);
+        });
+    }
   }
 
   getUpdatedUserDetails() {
@@ -61,110 +124,75 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
-  openDialog(type: string): void {
-    switch (type) {
-      case 'first-load':
-        if (!localStorage.getItem('userId')) {
-          const dialogRef = this.dialog.open(DialogComponent, {
-            data: { type: 'first-load' },
-            width: '365px',
-            height: '290px',
-            disableClose: true,
-          });
-          dialogRef.afterClosed().subscribe((status) => {
-            if (status) {
-              this.firstName = localStorage.getItem('firstName');
-              this.lastName = localStorage.getItem('lastName');
-              this.userId = localStorage.getItem('userId');
-              this.getUserMessages();
-              this.getChatHistory();
-              this._sharedService.setUserDetails({
-                firstName: this.firstName,
-                lastName: this.lastName,
-                userId: this.userId,
-              });
-            }
-          });
-        }
-    }
-  }
-
-  openSnackBar(message: string, time: number) {
-    const config = new MatSnackBarConfig();
-    config.duration = time; // Duration in milliseconds
-    config.verticalPosition = 'top';
-    config.panelClass = ['center-text'];
-    this._snackBar.open(message, '', config);
-  }
-
   sendMessage() {
     if (this.userMessage !== '') {
       const currentTime = new Date().toLocaleTimeString([], {
         hour: '2-digit',
         minute: '2-digit',
       });
-      const message = {
-        userName: 'You',
-        userMessage: this.userMessage,
-        time: currentTime,
-      };
-
-      this.messages[0].isAdmin
-        ? this.messages.push({ ...message, isAdmin: true })
-        : this.messages.push(message);
       const firstName = localStorage.getItem('firstName');
       const lastName = localStorage.getItem('lastName');
-      const payload = {
+      let payload = {
         userName: `${firstName} ${lastName}`,
         userId: localStorage.getItem('userId'),
         userMessage: this.userMessage,
         time: currentTime,
+        groupId: this.groupId,
       };
-      this._chatService.sendMessageInFusionXChat(JSON.stringify(payload));
+
+      if (this.isGroupsCompo) {
+        this._chatService.sendMessage(payload);
+      } else {
+        this._chatService.sendMessageInFusionXChat(payload);
+      }
       this.userMessage = '';
-      requestAnimationFrame(() => {
-        this.scrollToBottom();
-      });
     }
   }
 
-  getChatHistory() {
-    this.openSnackBar('Waiting for connection...', 0);
-    this._chatService.getChatHistory(this.userId).subscribe((data: any) => {
-      this.messages = data;
-      this.messages.forEach((ele) => {
-        if (this.userId === ele.userId) {
-          ele.userName = 'You';
-        }
+  getChatFusionXChatHistory() {
+    this._sharedService.openSnackBar('Waiting for connection...', 0);
+    this._chatService
+      .getChatFusionXHistory(this.userId)
+      .subscribe((data: any) => {
+        this.messages = data;
+        this.messages.forEach((ele) => {
+          if (this.userId === ele.userId) {
+            ele.userName = 'You';
+          }
+        });
+        this._sharedService.closeSnackBar();
+        this.isProfileButtonActive = false;
+        this.isSendMsgButtonActive = false;
+        requestAnimationFrame(() => {
+          this.scrollToBottom();
+        });
       });
-      this._snackBar.dismiss();
-      this.isProfileButtonActive = false;
-      this.isSendMsgButtonActive = false;
-      requestAnimationFrame(() => {
-        this.scrollToBottom();
-      });
-    });
   }
 
-  getUserMessages() {
+  getChatFusionXUserMessages() {
     this._chatFusionXMsgSubscription = this._chatService
-      .getUsersMessage()
-      .subscribe((messages) => {
-        const userMessage = JSON.parse(messages);
-        this.messages.push(userMessage);
+      .getChatFusionXUsersMessage()
+      .subscribe((messages: any) => {
+        if (messages.userId === this.userId) {
+          messages.userName = 'You';
+          requestAnimationFrame(() => {
+            this.scrollToBottom();
+          });
+        }
+        this.messages.push(messages);
       });
   }
 
   deleteMessage(chatId: string) {
-    this._chatService.deleteChat(chatId, this.userId).subscribe({
+    this._chatService.deleteChatFusionXChat(chatId, this.userId).subscribe({
       next: (res: any) => {
-        this.openSnackBar(res.message, 2000);
+        this._sharedService.openSnackBar(res.message, 2000);
         this.messages = this.messages.filter((ele) => {
           return ele._id !== chatId;
         });
       },
       error: (error) => {
-        this.openSnackBar(error.message, 2000);
+        this._sharedService.openSnackBar(error.message, 2000);
       },
     });
   }
@@ -181,5 +209,8 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
   ngOnDestroy(): void {
     this.isGroupsCompo = false;
     this._chatFusionXMsgSubscription.unsubscribe();
+    this._getSelectedGroupChatSubscription.unsubscribe();
+    this._onGroupMessageSubscription.unsubscribe();
+    this._isLoadFirstTimeChatCompoSubscription.unsubscribe();
   }
 }

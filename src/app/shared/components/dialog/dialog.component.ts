@@ -1,6 +1,7 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { MatSnackBar, MatSnackBarConfig } from '@angular/material/snack-bar';
+import { Subscription } from 'rxjs';
 import { ChatService } from 'src/app/chat-module/services/chat/chat.service';
 
 @Component({
@@ -8,12 +9,14 @@ import { ChatService } from 'src/app/chat-module/services/chat/chat.service';
   templateUrl: './dialog.component.html',
   styleUrls: ['./dialog.component.scss'],
 })
-export class DialogComponent implements OnInit {
+export class DialogComponent implements OnInit, OnDestroy {
+  private _createdGroupSubscription: Subscription = new Subscription();
   public userFirstName: string = '';
   public userLastName: string = '';
+  public groupName: string = '';
   public isLoding: boolean = false;
   constructor(
-    @Inject(MAT_DIALOG_DATA) private data: any,
+    @Inject(MAT_DIALOG_DATA) public data: any,
     private _dialogRef: MatDialogRef<DialogComponent>,
     private _chatService: ChatService,
     private _snackBar: MatSnackBar
@@ -28,11 +31,27 @@ export class DialogComponent implements OnInit {
       case 'edit-profile':
         this.userFirstName = localStorage.getItem('firstName');
         this.userLastName = localStorage.getItem('lastName');
+        break;
+      case 'create-group':
+        this.getGroupCreatedDetails();
+        break;
     }
   }
 
+  getGroupCreatedDetails() {
+    this._createdGroupSubscription = this._chatService
+      .onGroupCreate()
+      .subscribe((data) => {
+        this.isLoding = false;
+        this._dialogRef.close(true);
+      });
+  }
+
   disabled() {
-    if (this.userFirstName === '' || this.userLastName === '') {
+    if (
+      (this.userFirstName === '' || this.userLastName === '') &&
+      this.groupName === ''
+    ) {
       return true;
     } else if (
       this.userFirstName === localStorage.getItem('firstName') &&
@@ -43,7 +62,7 @@ export class DialogComponent implements OnInit {
     return false;
   }
 
-  public saveUserDetails() {
+  public saveDetails() {
     switch (this.data.type) {
       case 'first-load':
         if (this.userFirstName !== '' && this.userLastName !== '') {
@@ -87,6 +106,16 @@ export class DialogComponent implements OnInit {
               );
             },
           });
+        break;
+      case 'create-group':
+        this.isLoding = true;
+        const userId = localStorage.getItem('userId');
+        this._chatService.createGroup(this.groupName, userId);
+        break;
     }
+  }
+
+  ngOnDestroy(): void {
+    this._createdGroupSubscription.unsubscribe();
   }
 }
