@@ -37,14 +37,14 @@ export class GroupsComponent implements OnInit, OnDestroy {
   }
 
   setRouteBaseOnPathUrl() {
-    this.getGroupsDetails();
+    this.getGroupsList();
     //get path url after first time load component
     const activePath = this._activateRoute.snapshot.url
       .map((segment) => segment.path)
       .join('/');
     const groupsPath = `/chatfusionx/groups/${this._userId}`;
     this.openChat = groupsPath !== `/chatfusionx/${activePath}`;
-    if (!this.openChat) this.setGroupLogin();
+    if (!this.openChat) this._chatService.groupList(this._userId);
     this.groupName = localStorage.getItem('groupName');
     //subscribe route path change events
     this._routeEventSubscription = this._router.events
@@ -52,24 +52,15 @@ export class GroupsComponent implements OnInit, OnDestroy {
       .subscribe((event: NavigationEnd) => {
         const isGroupsRoute = event.url === groupsPath;
         this.openChat = !isGroupsRoute;
-        if (isGroupsRoute) this.setGroupLogin();
+        if (isGroupsRoute) this._chatService.groupList(this._userId);
       });
   }
 
-  setGroupLogin() {
-    this.groups = [];
-    this._chatService.login({
-      firstName: this._firstName,
-      lastName: this._lastName,
-      userId: this._userId,
-    });
-  }
-
-  getGroupsDetails() {
+  getGroupsList() {
     this._groupDetailsSubscription = this._chatService
-      .onGroupDetails()
+      .onGroupList()
       .subscribe((data) => {
-        this.groups.push(data);
+        this.groups = data.groupDetails;
       });
   }
 
@@ -92,6 +83,7 @@ export class GroupsComponent implements OnInit, OnDestroy {
 
   back() {
     this._router.navigate([`/chatfusionx/groups/${this._userId}`]);
+    localStorage.setItem('groupId', '');
   }
 
   shareGroupLink() {

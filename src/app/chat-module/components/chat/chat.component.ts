@@ -70,7 +70,6 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
         const path = currentRoute.split('/');
         this.groupId = path[path.length - 1];
         this._chatService.getGroupMessages(this.groupId);
-        this._chatService.joinGroup(this.groupId, this.userId);
       }
     }
   }
@@ -111,7 +110,9 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
               this.scrollToBottom();
             });
           }
-          this.messages.push(groupMessage);
+          if (this.groupId === groupMessage.groupId) {
+            this.messages.push(groupMessage);
+          }
         });
     }
   }

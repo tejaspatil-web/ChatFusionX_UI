@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
-import { filter } from 'rxjs';
+import { Subscription, filter } from 'rxjs';
 import { ChatService } from '../../services/chat/chat.service';
 import { MatDialog } from '@angular/material/dialog';
 import { SharedService } from 'src/app/shared/services/shared-service/shared-service.service';
@@ -18,6 +18,7 @@ export class MainComponent implements OnInit, OnDestroy {
   private _lastName: string = '';
   private _isLoadFirsTime: boolean = true;
   private _firstLoadUrlPath: string = '';
+  private _onGroupMessageSubscription: Subscription = new Subscription();
   constructor(
     private _chatService: ChatService,
     private _router: Router,
@@ -29,13 +30,28 @@ export class MainComponent implements OnInit, OnDestroy {
     this._userId = localStorage.getItem('userId');
     this._firstName = localStorage.getItem('firstName');
     this._lastName = localStorage.getItem('lastName');
-    this.openDialog('first-load');
+
+    if (!localStorage.getItem('userId')) {
+      this.openDialog('first-load');
+    } else {
+      this.setGroupLogin();
+      this.getAllChatMessages();
+    }
+
     //On chatFusionX group connection
     this._chatService.joinFusionXChatRoom();
     this._chatService.onSocketForGetChatFusionXUsersMessage();
     //get active route path
     this.getActiveRoutePath();
     this.onUserJoinToNewGroup();
+  }
+
+  setGroupLogin() {
+    this._chatService.login({
+      firstName: this._firstName,
+      lastName: this._lastName,
+      userId: this._userId,
+    });
   }
 
   getActiveRoutePath() {
@@ -70,6 +86,7 @@ export class MainComponent implements OnInit, OnDestroy {
                 userId: this._userId,
               });
               this.setUserRoutePath();
+              this.setGroupLogin();
             }
           });
         }
@@ -102,6 +119,27 @@ export class MainComponent implements OnInit, OnDestroy {
       localStorage.setItem('groupName', message.groupName);
       this._router.navigate([`/chatfusionx/groups/${message.groupId}`]);
     });
+  }
+
+  getAllChatMessages() {
+    this._onGroupMessageSubscription = this._chatService
+      .onMessage()
+      .subscribe((message) => {
+        const groupId = localStorage.getItem('groupId');
+        const userId = localStorage.getItem('userId');
+        if (
+          groupId !== '' &&
+          (groupId === message.groupId || message.userId === userId)
+        ) {
+          this._chatService.readAllMessages(userId, message.groupId);
+        }
+        if (
+          localStorage.getItem('groupId') === '' &&
+          this._userId !== message.userId
+        ) {
+          this._sharedService.setUnreadMessageCount(message);
+        }
+      });
   }
 
   ngOnDestroy(): void {}

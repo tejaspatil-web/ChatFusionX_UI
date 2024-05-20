@@ -9,7 +9,7 @@ import { Socket, io } from 'socket.io-client';
 export class ChatService {
   private _socket: Socket;
   private _url: string = 'https://chatfusionx-api.onrender.com';
-  // private _url: string = 'http://localhost:8080';
+  //private _url: string = 'http://localhost:8080';
   private _userMessages: Subject<string> = new Subject();
 
   constructor(private _http: HttpClient) {
@@ -28,12 +28,12 @@ export class ChatService {
     );
   }
 
-  createGroup(groupName: string, userId: string): void {
-    this._socket.emit('createGroup', groupName, userId);
+  groupList(userId: string) {
+    this._socket.emit('groupList', userId);
   }
 
-  joinGroup(groupId: string, userId: string): void {
-    this._socket.emit('joinGroup', groupId, userId);
+  createGroup(groupName: string, userId: string): void {
+    this._socket.emit('createGroup', groupName, userId);
   }
 
   getGroupMessages(groupId: string) {
@@ -65,6 +65,10 @@ export class ChatService {
 
   onGroupMessages(): Observable<any> {
     return this.onEvent('groupMessages');
+  }
+
+  onGroupList() {
+    return this.onEvent('getGroupsList');
   }
 
   onUnreadMessageCount(): Observable<any> {
