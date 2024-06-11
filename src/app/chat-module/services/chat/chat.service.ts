@@ -8,8 +8,8 @@ import { Socket, io } from 'socket.io-client';
 })
 export class ChatService {
   private _socket: Socket;
-  private _url: string = 'https://chatfusionx-api.onrender.com';
-  //private _url: string = 'http://localhost:8080';
+  // private _url: string = 'https://chatfusionx-api.onrender.com';
+  private _url: string = 'http://localhost:8080';
   private _userMessages: Subject<string> = new Subject();
 
   constructor(private _http: HttpClient) {
@@ -111,13 +111,13 @@ export class ChatService {
 
   getChatFusionXHistory(userId: string) {
     return this._http.get(
-      `${this._url}/api/user/getChatHistory/userId/${userId}`
+      `${this._url}/api/chat/getChatHistory/userId/${userId}`
     );
   }
 
   deleteChatFusionXChat(chatId: string, userId: string) {
     return this._http.delete(
-      `${this._url}/api/user/deleteChat/chatId/${chatId}/userId/${userId}`
+      `${this._url}/api/chat/deleteChat/chatId/${chatId}/userId/${userId}`
     );
   }
 

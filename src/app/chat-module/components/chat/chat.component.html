@@ -30,6 +30,7 @@
     <div class="msg-field">
       <input
         type="text"
+        #sendMessageInput
         [(ngModel)]="userMessage"
         [disabled]="isSendMsgButtonActive && !isGroupsCompo"
         placeholder="Type your message here"

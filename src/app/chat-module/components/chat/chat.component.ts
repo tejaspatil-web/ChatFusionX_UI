@@ -20,6 +20,7 @@ import { ActivatedRoute } from '@angular/router';
 })
 export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('scrollContainer') private scrollContainer: ElementRef;
+  @ViewChild('sendMessageInput') private sendMessageInput: ElementRef;
   @Input() isGroupsCompo: boolean = false;
   @Input() groupName: string = '';
   private _getSelectedGroupChatSubscription: Subscription = new Subscription();
@@ -42,7 +43,11 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
     private _sharedService: SharedService
   ) {}
 
-  ngAfterViewInit(): void {}
+  ngAfterViewInit(): void {
+    this.sendMessageInput.nativeElement.addEventListener('keyup', (event) => {
+      this.inputKeyupEvent(event);
+    });
+  }
 
   ngOnInit() {
     this.firstName = localStorage.getItem('firstName');
@@ -147,27 +152,37 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
         this._chatService.sendMessageInFusionXChat(payload);
       }
       this.userMessage = '';
+      this.sendMessageInput.nativeElement.focus();
     }
+  }
+
+  inputKeyupEvent(event: KeyboardEvent) {
+    if (event.key === 'Enter') this.sendMessage();
   }
 
   getChatFusionXChatHistory() {
     this._sharedService.openSnackBar('Waiting for connection...', 0);
-    this._chatService
-      .getChatFusionXHistory(this.userId)
-      .subscribe((data: any) => {
-        this.messages = data;
-        this.messages.forEach((ele) => {
-          if (this.userId === ele.userId) {
-            ele.userName = 'You';
-          }
+    this.firstName = localStorage.getItem('firstName');
+    this.lastName = localStorage.getItem('lastName');
+    this.userId = localStorage.getItem('userId');
+    if (this.userId) {
+      this._chatService
+        .getChatFusionXHistory(this.userId)
+        .subscribe((data: any) => {
+          this.messages = data;
+          this.messages.forEach((ele) => {
+            if (this.userId === ele.userId) {
+              ele.userName = 'You';
+            }
+          });
+          this._sharedService.closeSnackBar();
+          this.isProfileButtonActive = false;
+          this.isSendMsgButtonActive = false;
+          requestAnimationFrame(() => {
+            this.scrollToBottom();
+          });
         });
-        this._sharedService.closeSnackBar();
-        this.isProfileButtonActive = false;
-        this.isSendMsgButtonActive = false;
-        requestAnimationFrame(() => {
-          this.scrollToBottom();
-        });
-      });
+    }
   }
 
   getChatFusionXUserMessages() {
