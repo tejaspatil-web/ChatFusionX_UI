@@ -57,21 +57,9 @@
 }
 
 ::ng-deep {
-    .mat-mdc-form-field-flex {
+    .mat-mdc-form-field-infix {
         border: none !important;
         outline: none !important;
-    }
-
-    .mat-mdc-form-field-appearance-fill .mat-mdc-form-field-wrapper {
-        padding: 0 !important;
-    }
-
-    .mat-mdc-form-field-appearance-fill .mat-mdc-form-field-outline {
-        display: none !important;
-    }
-
-    .mat-mdc-form-field-appearance-outline .mat-mdc-form-field-outline {
-        display: none !important;
     }
 }
 
