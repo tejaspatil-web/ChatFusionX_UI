@@ -17,6 +17,7 @@ export class HeaderComponent implements OnInit {
   public lastName: string = '';
   public userId: string = '';
   public isNotBasePathRoute: boolean = false;
+  public groupCount: number = 0;
 
   constructor(
     public dialog: MatDialog,
@@ -25,19 +26,27 @@ export class HeaderComponent implements OnInit {
     private _router: Router
   ) {}
   ngOnInit(): void {
+    this.getGroupCount();
     this._router.events
       .pipe(filter((event) => event instanceof NavigationEnd))
       .subscribe((event: NavigationEnd) => {
         // Check if the current route path is the base path ('/')
         this.isNotBasePathRoute = event.url !== '/';
+        if (!this.isNotBasePathRoute && this.userId)
+          this._chatService.groupCount(this.userId);
       });
-
     this.firstName = localStorage.getItem('firstName');
     this.lastName = localStorage.getItem('lastName');
     this.userId = localStorage.getItem('userId');
     if (!this.userId) {
       this.getUserDetails();
     }
+  }
+
+  getGroupCount() {
+    this._chatService.getGroupCount().subscribe((count) => {
+      this.groupCount = count.groupsCount;
+    });
   }
 
   getUserDetails() {

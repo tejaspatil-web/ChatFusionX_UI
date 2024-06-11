@@ -32,6 +32,10 @@ export class ChatService {
     this._socket.emit('groupList', userId);
   }
 
+  groupCount(userId: string) {
+    this._socket.emit('groupCount', userId);
+  }
+
   createGroup(groupName: string, userId: string): void {
     this._socket.emit('createGroup', groupName, userId);
   }
@@ -69,6 +73,10 @@ export class ChatService {
 
   onGroupList() {
     return this.onEvent('getGroupsList');
+  }
+
+  getGroupCount() {
+    return this.onEvent('getGroupsCount');
   }
 
   onUnreadMessageCount(): Observable<any> {

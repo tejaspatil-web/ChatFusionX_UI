@@ -1,5 +1,5 @@
 <div *ngIf="!openChat" class="groups-container">
-  <div *ngIf="groups.length">
+  <div *ngIf="groups.length > 0; else groupsNotFound">
     <div
       *ngFor="let group of groups"
       (click)="openGroupChat(group)"
@@ -34,3 +34,10 @@
   </div>
   <app-chat [groupName]="groupName" [isGroupsCompo]="true"></app-chat>
 </div>
+
+<ng-template #groupsNotFound>
+  <h3 class="groupsNotFound">
+    Looks like there are no active group chats available right now. Feel free to
+    create a new group or join an existing one to start chatting with others!
+  </h3>
+</ng-template>
