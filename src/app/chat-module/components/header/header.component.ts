@@ -60,8 +60,8 @@ export class HeaderComponent implements OnInit {
   editProfile() {
     const dialogRef = this.dialog.open(DialogComponent, {
       data: { type: 'edit-profile' },
-      width: '365px',
-      height: '290px',
+      width: '300px',
+      height: '275px',
     });
     dialogRef.afterClosed().subscribe((status) => {
       if (status) {
@@ -81,7 +81,7 @@ export class HeaderComponent implements OnInit {
   createNewGroup() {
     const dialogRef = this.dialog.open(DialogComponent, {
       data: { type: 'create-group' },
-      width: '365px',
+      width: '300px',
       height: '200px',
     });
     //This code use may be use in future

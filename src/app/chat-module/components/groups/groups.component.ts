@@ -4,6 +4,13 @@ import { Subscription, filter } from 'rxjs';
 import { ChatService } from '../../services/chat/chat.service';
 import { SharedService } from 'src/app/shared/services/shared-service/shared-service.service';
 
+export interface groupDetails {
+  groupId: string;
+  groupName: string;
+  unreadCount: number;
+  _id: string;
+}
+
 @Component({
   selector: 'app-groups',
   templateUrl: './groups.component.html',
@@ -20,7 +27,7 @@ export class GroupsComponent implements OnInit, OnDestroy {
   private _getAllGroupChatSubscription: Subscription = new Subscription();
   private _getGroupMessageSubscription: Subscription = new Subscription();
   public groupName: string = '';
-  public groups = [];
+  public groups: groupDetails[] | null = null;
   constructor(
     private _router: Router,
     private _activateRoute: ActivatedRoute,
@@ -68,7 +75,13 @@ export class GroupsComponent implements OnInit, OnDestroy {
     this._createdGroupSubscription = this._chatService
       .onGroupCreate()
       .subscribe((data) => {
-        this.groups.push({ groupId: data.groupId, groupName: data.groupName });
+        const createdGroupDetails: groupDetails = {
+          groupId: data.groupId,
+          groupName: data.groupName,
+          unreadCount: 0,
+          _id: '',
+        };
+        this.groups.push(createdGroupDetails);
         this._sharedService.openSnackBar(data.message, 2000);
       });
   }

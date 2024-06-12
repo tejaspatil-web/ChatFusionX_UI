@@ -1,43 +1,52 @@
-<div *ngIf="!openChat" class="groups-container">
-  <div *ngIf="groups.length > 0; else groupsNotFound">
-    <div
-      *ngFor="let group of groups"
-      (click)="openGroupChat(group)"
-      class="group-list"
-    >
-      <div class="group">
+<div *ngIf="true">
+  <div *ngIf="!openChat" class="groups-container">
+    <div *ngIf="groups !== null && groups?.length !== 0">
+      <div
+        *ngFor="let group of groups"
+        (click)="openGroupChat(group)"
+        class="group-list"
+      >
+        <div class="group">
+          <span class="group-icon">
+            <mat-icon>group</mat-icon>
+          </span>
+          <span class="group-name">{{ group.groupName }}</span>
+        </div>
+        <span *ngIf="group.unreadCount" class="notifiction-count">{{
+          group.unreadCount
+        }}</span>
+      </div>
+    </div>
+
+    <div class="groupsNotFound" *ngIf="groups?.length === 0">
+      <h3>
+        Looks like there are no active group chats available right now. Feel
+        free to create a new group or join an existing one to start chatting
+        with others!
+      </h3>
+    </div>
+
+    <div class="spinner" *ngIf="groups === null">
+      <div *ngIf="true" class="spinner-border text-light" role="status">
+        <span class="sr-only">Loading...</span>
+      </div>
+    </div>
+  </div>
+  <div *ngIf="openChat">
+    <div class="group-header">
+      <div class="group-left-content">
+        <span class="back-btn"
+          ><mat-icon (click)="back()">arrow_back</mat-icon></span
+        >
         <span class="group-icon">
           <mat-icon>group</mat-icon>
         </span>
-        <span class="group-name">{{ group.groupName }}</span>
+        <span class="group-name">{{ groupName }}</span>
       </div>
-      <span *ngIf="group.unreadCount" class="notifiction-count">{{
-        group.unreadCount
-      }}</span>
+      <div (click)="shareGroupLink()" class="group-right-content">
+        <mat-icon>share</mat-icon>
+      </div>
     </div>
+    <app-chat [groupName]="groupName" [isGroupsCompo]="true"></app-chat>
   </div>
 </div>
-<div *ngIf="openChat">
-  <div class="group-header">
-    <div class="group-left-content">
-      <span class="back-btn"
-        ><mat-icon (click)="back()">arrow_back</mat-icon></span
-      >
-      <span class="group-icon">
-        <mat-icon>group</mat-icon>
-      </span>
-      <span class="group-name">{{ groupName }}</span>
-    </div>
-    <div (click)="shareGroupLink()" class="group-right-content">
-      <mat-icon>share</mat-icon>
-    </div>
-  </div>
-  <app-chat [groupName]="groupName" [isGroupsCompo]="true"></app-chat>
-</div>
-
-<ng-template #groupsNotFound>
-  <h3 class="groupsNotFound">
-    Looks like there are no active group chats available right now. Feel free to
-    create a new group or join an existing one to start chatting with others!
-  </h3>
-</ng-template>

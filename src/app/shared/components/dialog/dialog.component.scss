@@ -1,3 +1,13 @@
+p {
+    padding: 0px !important;
+    margin: 0px !important;
+}
+
+h3 {
+    padding: 0px !important;
+    margin: 0px !important;
+}
+
 .dialog-container {
     padding: 20px;
     display: flex;
@@ -15,6 +25,7 @@
         text-align: center;
         color: white;
         font-weight: 300;
+        font-size: large;
     }
 }
 

@@ -70,8 +70,8 @@ export class MainComponent implements OnInit, OnDestroy {
         if (!localStorage.getItem('userId')) {
           const dialogRef = this.dialog.open(DialogComponent, {
             data: { type: 'first-load' },
-            width: '365px',
-            height: '290px',
+            width: '300px',
+            height: '275px',
             disableClose: true,
           });
           dialogRef.afterClosed().subscribe((status) => {
