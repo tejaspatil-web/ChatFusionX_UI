@@ -1,43 +1,164 @@
 <div class="chat-container">
-  <div
-    [ngClass]="{
-      'group-messages ': isGroupsCompo,
-      'chat-messages': !isGroupsCompo
-    }"
-    #scrollContainer
-  >
-    <div class="header-name"></div>
+  <div *ngIf="isGroupsCompo">
     <div
       [ngClass]="{
-        'your-message': message.userName === 'You',
-        message: message.userName !== 'You'
+        'group-messages ': isGroupsCompo,
+        'chat-messages': !isGroupsCompo
       }"
-      *ngFor="let message of messages"
+      #scrollContainer
     >
-      <span class="sender">{{ message.userName }} :</span>
-      <span class="message-body">{{ message.userMessage }}</span>
-      <span
-        *ngIf="message.isAdmin"
-        (click)="deleteMessage(message._id)"
-        class="delete-msg"
-        ><mat-icon>delete_forever</mat-icon></span
+      <div class="header-name"></div>
+      <div
+        [ngClass]="{
+          'your-message': message.userName === 'You',
+          message: message.userName !== 'You'
+        }"
+        *ngFor="let message of messages"
       >
-      <span class="time">{{ message.time }}</span>
+        <span class="sender">{{ message.userName }} :</span>
+        <span class="message-body">{{ message.userMessage }}</span>
+        <span
+          *ngIf="message.isAdmin"
+          (click)="deleteMessage(message._id)"
+          class="delete-msg"
+          ><mat-icon>delete_forever</mat-icon></span
+        >
+        <span class="time">{{ message.time }}</span>
+      </div>
+    </div>
+
+    <div class="chat-input">
+      <div class="msg-field">
+        <input
+          type="text"
+          #sendMessageInput
+          [(ngModel)]="userMessage"
+          [disabled]="isSendMsgButtonActive && !isGroupsCompo"
+          placeholder="Type your message here"
+        />
+      </div>
+      <button id="send-button" (click)="sendMessageInGroup()">
+        <mat-icon>send</mat-icon>
+      </button>
     </div>
   </div>
 
-  <div class="chat-input">
-    <div class="msg-field">
-      <input
-        type="text"
-        #sendMessageInput
-        [(ngModel)]="userMessage"
-        [disabled]="isSendMsgButtonActive && !isGroupsCompo"
-        placeholder="Type your message here"
-      />
-    </div>
-    <button id="send-button" (click)="sendMessage()">
-      <mat-icon>send</mat-icon>
-    </button>
+  <div *ngIf="!isGroupsCompo">
+    <mat-stepper (selectionChange)="stepperSelectionChanged($event)">
+      <!-- FusionX Group -->
+      <mat-step label="FusionX Group">
+        <div
+          [ngClass]="{
+            'group-messages ': isGroupsCompo,
+            'chat-messages': !isGroupsCompo
+          }"
+          #scrollContainer
+        >
+          <div class="header-name"></div>
+          <div
+            [ngClass]="{
+              'your-message': message.userName === 'You',
+              message: message.userName !== 'You'
+            }"
+            *ngFor="let message of messages"
+          >
+            <span class="sender">{{ message.userName }} :</span>
+            <span class="message-body">{{ message.userMessage }}</span>
+            <span
+              *ngIf="message.isAdmin"
+              (click)="deleteMessage(message._id)"
+              class="delete-msg"
+              ><mat-icon>delete_forever</mat-icon></span
+            >
+            <span class="time">{{ message.time }}</span>
+          </div>
+        </div>
+
+        <div class="chat-input">
+          <div class="msg-field">
+            <input
+              type="text"
+              #sendMessageInput
+              [(ngModel)]="userMessage"
+              [disabled]="isSendMsgButtonActive && !isGroupsCompo"
+              placeholder="Type your message here"
+            />
+          </div>
+          <button id="send-button" (click)="sendMessageInGroup()">
+            <mat-icon>send</mat-icon>
+          </button>
+        </div>
+      </mat-step>
+
+      <!-- FusionX AI -->
+      <mat-step label="FusionX AI">
+        <div
+          [ngClass]="{
+            'group-messages ': isGroupsCompo,
+            'chat-messages': !isGroupsCompo
+          }"
+          #scrollAiContainer
+        >
+          <div class="header-name"></div>
+          <div
+            [ngClass]="{
+              'your-message': response?.userName === 'You',
+              message: response?.userName !== 'You'
+            }"
+            *ngFor="let response of aiResponseData"
+          >
+            <span class="sender">{{ response?.userName }} :</span>
+            <div *ngIf="!response.userMessage; else loader" class="loader">
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+            <ng-template #loader>
+              <span class="message-body-ai">
+                {{ response?.userMessage }}
+              </span>
+            </ng-template>
+            <span
+              *ngIf="response?.isAdmin"
+              (click)="deleteMessage(response?._id)"
+              class="delete-msg"
+              ><mat-icon>delete_forever</mat-icon></span
+            >
+            <span class="time">{{ response?.time }}</span>
+          </div>
+        </div>
+
+        <div class="chat-input">
+          <div class="msg-field">
+            <input
+              type="text"
+              #sendMessageAiInput
+              [(ngModel)]="userMessage"
+              [disabled]="
+                (isSendMsgButtonActive && !isGroupsCompo) || isAiResponse
+              "
+              placeholder="Type your message here"
+            />
+          </div>
+          <button
+            [disabled]="isAiResponse"
+            id="send-button"
+            (click)="sendPrompt()"
+          >
+            <mat-icon>send</mat-icon>
+          </button>
+        </div>
+      </mat-step>
+
+      <!-- changed edit icons -->
+      <ng-template matStepperIcon="edit">
+        <mat-icon>done_all</mat-icon>
+      </ng-template>
+
+      <!-- changed number icons -->
+      <ng-template matStepperIcon="number">
+        <mat-icon>done_all</mat-icon>
+      </ng-template>
+    </mat-stepper>
   </div>
 </div>

@@ -12,6 +12,7 @@ import { OnInit } from '@angular/core';
 import { SharedService } from 'src/app/shared/services/shared-service/shared-service.service';
 import { Subscription } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
+import { Shared } from 'src/app/shared/models/shared.model';
 
 @Component({
   selector: 'app-chat',
@@ -20,19 +21,24 @@ import { ActivatedRoute } from '@angular/router';
 })
 export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('scrollContainer') private scrollContainer: ElementRef;
+  @ViewChild('scrollAiContainer') private scrollAiContainer: ElementRef;
   @ViewChild('sendMessageInput') private sendMessageInput: ElementRef;
+  @ViewChild('sendMessageAiInput') private sendMessageAiInput: ElementRef;
   @Input() isGroupsCompo: boolean = false;
   @Input() groupName: string = '';
   private _getSelectedGroupChatSubscription: Subscription = new Subscription();
   public userMessage: string = '';
   public messages = [];
+  public aiResponseData = [];
   public firstName: string = '';
   public lastName: string = '';
   public userId: string = '';
   private groupId: string = '';
   public isProfileButtonActive: boolean = true;
   public isSendMsgButtonActive: boolean = true;
+  public isAiResponse: boolean = false;
   public isAdminUser: boolean = false;
+  private selectedStepper: string = 'FusionX Group';
   private _chatFusionXMsgSubscription: Subscription = new Subscription();
   private _onGroupMessageSubscription: Subscription = new Subscription();
   private _isLoadFirstTimeChatCompoSubscription: Subscription =
@@ -43,12 +49,6 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
     private _sharedService: SharedService
   ) {}
 
-  ngAfterViewInit(): void {
-    this.sendMessageInput.nativeElement.addEventListener('keyup', (event) => {
-      this.inputKeyupEvent(event);
-    });
-  }
-
   ngOnInit() {
     this.firstName = localStorage.getItem('firstName');
     this.lastName = localStorage.getItem('lastName');
@@ -58,6 +58,31 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
     this.getSelectedGroupChat();
     this.getGroupMessages();
     this.getIsLoadFirstTimeChatCompo();
+  }
+
+  ngAfterViewInit(): void {
+    this.sendMessageInput.nativeElement.addEventListener('keyup', (event) => {
+      this.inputKeyupEvent(event);
+    });
+
+    if (!this.isGroupsCompo) {
+      this.sendMessageAiInput.nativeElement.addEventListener(
+        'keyup',
+        (event) => {
+          this.inputKeyupEvent(event);
+        }
+      );
+    }
+  }
+
+  inputKeyupEvent(event: KeyboardEvent) {
+    if (event.key === 'Enter') {
+      if (this.selectedStepper === 'FusionX Group') {
+        this.sendMessageInGroup();
+      } else {
+        this.sendPrompt();
+      }
+    }
   }
 
   getSelectedRoutePath() {
@@ -130,12 +155,9 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
-  sendMessage() {
+  sendMessageInGroup() {
     if (this.userMessage !== '') {
-      const currentTime = new Date().toLocaleTimeString([], {
-        hour: '2-digit',
-        minute: '2-digit',
-      });
+      const currentTime = new Shared().getCurrentTime();
       const firstName = localStorage.getItem('firstName');
       const lastName = localStorage.getItem('lastName');
       let payload = {
@@ -154,10 +176,6 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
       this.userMessage = '';
       this.sendMessageInput.nativeElement.focus();
     }
-  }
-
-  inputKeyupEvent(event: KeyboardEvent) {
-    if (event.key === 'Enter') this.sendMessage();
   }
 
   getChatFusionXChatHistory() {
@@ -213,13 +231,72 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
+  sendPrompt() {
+    if (this.userMessage) {
+      this.isAiResponse = true;
+      const id = this.aiResponseData.length + 1;
+      const currentTime = new Shared().getCurrentTime();
+      this.aiResponseData.push({
+        userName: 'You',
+        userMessage: this.userMessage,
+        time: currentTime,
+        _id: null,
+      });
+
+      this.aiResponseData.push({
+        userName: 'Ai',
+        userMessage: null,
+        time: null,
+        _id: id,
+      });
+
+      this._chatService
+        .getAiResponse(this.userMessage)
+        .subscribe((response) => {
+          this.aiResponseData.forEach((ele) => {
+            if (ele._id === id) {
+              ele.userMessage = response;
+              ele.time = currentTime;
+            }
+            this.isAiResponse = false;
+          });
+          requestAnimationFrame(() => {
+            this.scrollToBottomAiChat();
+          });
+        });
+      requestAnimationFrame(() => {
+        this.scrollToBottomAiChat();
+      });
+      this.userMessage = '';
+      this.sendMessageAiInput.nativeElement.focus();
+    }
+  }
+
+  stepperSelectionChanged(event) {
+    event.previouslySelectedStep.interacted = false;
+    this.selectedStepper = event.selectedStep.label;
+  }
+
   scrollToBottom(): void {
     try {
       this.scrollContainer.nativeElement.scrollTo({
         top: this.scrollContainer.nativeElement.scrollHeight,
         behavior: 'smooth',
       });
-    } catch (err) {}
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  scrollToBottomAiChat(): void {
+    try {
+      this.scrollAiContainer.nativeElement.scrollTo({
+        top: this.scrollAiContainer.nativeElement.scrollHeight,
+        behavior: 'smooth',
+      });
+    } catch (err) {
+      console.error(err);
+    }
   }
 
   ngOnDestroy(): void {

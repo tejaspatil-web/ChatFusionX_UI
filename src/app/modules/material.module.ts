@@ -10,6 +10,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatStepperModule } from '@angular/material/stepper';
 
 @NgModule({
   declarations: [],
@@ -26,6 +27,7 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
     MatButtonModule,
     MatProgressSpinnerModule,
     MatSnackBarModule,
+    MatStepperModule,
   ],
   exports: [
     MatDialogModule,
@@ -39,6 +41,7 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
     MatButtonModule,
     MatProgressSpinnerModule,
     MatSnackBarModule,
+    MatStepperModule,
   ],
 })
 export class MaterialModule {}
