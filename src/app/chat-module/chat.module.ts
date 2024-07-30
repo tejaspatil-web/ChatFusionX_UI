@@ -8,6 +8,7 @@ import { SharedModule } from '../shared/shared.module';
 import { MainComponent } from './components/main/main.component';
 import { HeaderComponent } from './components/header/header.component';
 import { GroupsComponent } from './components/groups/groups.component';
+import { TextTransformPipe } from '../shared/pipes/text-transform.pipe';
 
 @NgModule({
   declarations: [
@@ -15,6 +16,7 @@ import { GroupsComponent } from './components/groups/groups.component';
     MainComponent,
     HeaderComponent,
     GroupsComponent,
+    TextTransformPipe,
   ],
   imports: [
     CommonModule,

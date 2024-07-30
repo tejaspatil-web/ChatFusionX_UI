@@ -114,9 +114,10 @@
               <span></span>
             </div>
             <ng-template #loader>
-              <span class="message-body-ai">
-                {{ response?.userMessage }}
-              </span>
+              <span
+                class="message-body-ai"
+                [innerHTML]="convertMarkdown(response?.userMessage)"
+              ></span>
             </ng-template>
             <span
               *ngIf="response?.isAdmin"

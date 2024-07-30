@@ -8,16 +8,16 @@ import { Socket, io } from 'socket.io-client';
 })
 export class ChatService {
   private _socket: Socket;
-  private _url: string = 'https://chatfusionx-api.onrender.com';
-  //private _url: string = 'http://localhost:8080';
+  // private _url: string = 'https://chatfusionx-api.onrender.com';
+  private _url: string = 'http://localhost:8080';
   private _userMessages: Subject<string> = new Subject();
 
   constructor(private _http: HttpClient) {
     this._socket = io(this._url);
   }
 
-  getAiResponse(prompt: string) {
-    const userMessage = { prompt: prompt };
+  getAiResponse(prompt: string, history) {
+    const userMessage = { prompt: prompt, history: history };
     return this._http.post(`${this._url}/api/genai/getAiResponse`, userMessage);
   }
 

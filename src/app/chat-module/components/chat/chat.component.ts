@@ -4,7 +4,6 @@ import {
   ElementRef,
   Input,
   OnDestroy,
-  Output,
   ViewChild,
 } from '@angular/core';
 import { ChatService } from '../../services/chat/chat.service';
@@ -13,6 +12,16 @@ import { SharedService } from 'src/app/shared/services/shared-service/shared-ser
 import { Subscription } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
 import { Shared } from 'src/app/shared/models/shared.model';
+import { marked } from 'marked';
+
+interface aiResponseHistroy {
+  role: 'user' | 'model';
+  parts: aiResponse[];
+}
+
+interface aiResponse {
+  text: string;
+}
 
 @Component({
   selector: 'app-chat',
@@ -30,6 +39,7 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
   public userMessage: string = '';
   public messages = [];
   public aiResponseData = [];
+  private _aiResponseHistroy: aiResponseHistroy[] = [];
   public firstName: string = '';
   public lastName: string = '';
   public userId: string = '';
@@ -58,6 +68,15 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
     this.getSelectedGroupChat();
     this.getGroupMessages();
     this.getIsLoadFirstTimeChatCompo();
+
+    this._aiResponseHistroy.push({
+      role: 'user',
+      parts: [],
+    });
+    this._aiResponseHistroy.push({
+      role: 'model',
+      parts: [],
+    });
   }
 
   ngAfterViewInit(): void {
@@ -73,6 +92,10 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
         }
       );
     }
+  }
+
+  convertMarkdown(content: string) {
+    return marked(content);
   }
 
   inputKeyupEvent(event: KeyboardEvent) {
@@ -250,9 +273,13 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
         _id: id,
       });
 
-      this._chatService
-        .getAiResponse(this.userMessage)
-        .subscribe((response) => {
+      const history =
+        this._aiResponseHistroy[0].parts.length > 0
+          ? this._aiResponseHistroy
+          : '';
+
+      this._chatService.getAiResponse(this.userMessage, history).subscribe({
+        next: (response: any) => {
           this.aiResponseData.forEach((ele) => {
             if (ele._id === id) {
               ele.userMessage = response;
@@ -260,15 +287,32 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
             }
             this.isAiResponse = false;
           });
+
+          this._aiResponseHistroy
+            .find((ele) => ele.role == 'user')
+            .parts.push({
+              text: this.aiResponseData[this.aiResponseData.length - 2]
+                .userMessage,
+            });
+
+          this._aiResponseHistroy
+            .find((ele) => ele.role == 'model')
+            .parts.push({
+              text: response,
+            });
           requestAnimationFrame(() => {
             this.scrollToBottomAiChat();
+            this.sendMessageAiInput.nativeElement.focus();
           });
-        });
+        },
+        error: (error) => {
+          this.isAiResponse = false;
+        },
+      });
       requestAnimationFrame(() => {
         this.scrollToBottomAiChat();
       });
       this.userMessage = '';
-      this.sendMessageAiInput.nativeElement.focus();
     }
   }
 
